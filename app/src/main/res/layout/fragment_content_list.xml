@@ -22,16 +22,30 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="@color/white"
             app:expandedTitleGravity="top"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/content_list_toolbar"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+
+                <Spinner
+                    android:id="@+id/content_list_filter_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_toStartOf="@id/content_list_filter_btn" />
+
+                <ImageButton
+                    android:id="@+id/content_list_filter_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_touch" />
+            </RelativeLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

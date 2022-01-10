@@ -39,7 +39,11 @@ class MainActivity : AppCompatActivity() {
         val autoCompleteAdapter = ArrayAdapter(this, R.layout.item_auto_complete, items)
         binding.mainAutoCompleteTv.apply {
             setAdapter(autoCompleteAdapter)
-            setOnFocusChangeListener { view, boolean ->  }
+            setOnFocusChangeListener { view, focus ->
+                if (focus) {
+                    showDropDown()
+                }
+            }
         }
 
     }
