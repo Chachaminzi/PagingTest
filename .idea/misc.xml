@@ -5,8 +5,11 @@
       <map>
         <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/drawable/ic_search.xml" value="0.1" />
         <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/layout/activity_main.xml" value="0.3515625" />
+        <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/layout/fragment_content.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/layout/fragment_content_list.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/layout/fragment_web.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/layout/item_auto_complete.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/layout/item_content_list.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/w00y00/AndroidStudioProjects/PagingTest/app/src/main/res/menu/options_menu.xml" value="0.36614583333333334" />
       </map>
     </option>
