@@ -3,18 +3,15 @@ package com.example.pagingtest
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pagingtest.databinding.ItemContentListBinding
 import com.example.pagingtest.models.Content
 
 class ContentAdapter(private val onClickListener: ContentClickListener) :
-    RecyclerView.Adapter<ContentAdapter.ViewHolder>() {
-
-    var data = listOf<Content>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    PagingDataAdapter<Content, ContentAdapter.ViewHolder>(ContentDiffCallback()) {
 
     class ViewHolder private constructor(private val binding: ItemContentListBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -39,12 +36,23 @@ class ContentAdapter(private val onClickListener: ContentClickListener) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(data[position], onClickListener)
+        val item = getItem(position)
+        item?.let {
+            holder.bind(it, onClickListener)
+        }
     }
-
-    override fun getItemCount(): Int = data.size
 
     class ContentClickListener(private val clickListener: (item: Content) -> Unit) {
         fun onClick(item: Content) = clickListener(item)
+    }
+}
+
+class ContentDiffCallback : DiffUtil.ItemCallback<Content>() {
+    override fun areItemsTheSame(oldItem: Content, newItem: Content): Boolean {
+        return oldItem.contents == newItem.contents
+    }
+
+    override fun areContentsTheSame(oldItem: Content, newItem: Content): Boolean {
+        return oldItem == newItem
     }
 }

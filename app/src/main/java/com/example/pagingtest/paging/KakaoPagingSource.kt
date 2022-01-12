@@ -27,7 +27,11 @@ class KakaoPagingSource(
         val apiQuery = query
 
         return try {
-            val response = service.searchCafe()
+            val response = service.searchCafe(
+                query = apiQuery,
+                page = position,
+                size = NETWORK_PAGE_SIZE
+            )
             val documents = response.documents
             val nextKey = if (documents.isEmpty()) {
                 null
@@ -35,7 +39,9 @@ class KakaoPagingSource(
                 position + (params.loadSize / NETWORK_PAGE_SIZE)
             }
             LoadResult.Page(
-                data = documents
+                data = documents,
+                prevKey = if (position == KAKAO_STARTING_PAGE_INDEX) null else position - 1,
+                nextKey = nextKey
             )
         } catch (exception: IOException) {
             return LoadResult.Error(exception)

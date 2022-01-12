@@ -19,7 +19,7 @@ import com.example.pagingtest.viewmodels.MainViewModel
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    //Clean up
+    //Clean up >> fragment KTX 사용 여부 차이???
 //    private val mainViewModel: MainViewModel by lazy {
 //        ViewModelProvider(this).get(MainViewModel::class.java)
 //    }
@@ -29,8 +29,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.mainViewModel = mainViewModel
+        binding.lifecycleOwner = this
+//        binding = ActivityMainBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_container) as NavHostFragment
@@ -46,7 +49,6 @@ class MainActivity : AppCompatActivity() {
             )
             title = ""
         }
-
 
         // toolbar 관련 작업
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
