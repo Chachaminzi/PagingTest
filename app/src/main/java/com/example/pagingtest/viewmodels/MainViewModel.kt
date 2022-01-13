@@ -1,12 +1,27 @@
 package com.example.pagingtest.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
+import com.example.pagingtest.db.KeywordDao
+import com.example.pagingtest.db.KeywordEntity
+import com.example.pagingtest.db.SearchDatabase
+import com.example.pagingtest.db.getDatabase
 import com.example.pagingtest.models.Content
+import com.example.pagingtest.repository.KakaoRepository
+import com.example.pagingtest.repository.KeywordRepository
+import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    /**
+     * Database
+     **/
+    private val database = getDatabase(application)
+    private val keywordRepository = KeywordRepository(database)
+
+    val keywordList = keywordRepository.keywords
+
+    // 리스트에 보일 content
     private val _content = MutableLiveData<Content>()
     val content: LiveData<Content> get() = _content
 
@@ -30,6 +45,9 @@ class MainViewModel : ViewModel() {
     val isSubmit: LiveData<Boolean> get() = _isSubmit
 
     fun submitBtnClicked() {
-        _isSubmit.postValue(true)
+        viewModelScope.launch {
+            keywordRepository.updateKeyword(KeywordEntity(recordName = submitQuery.value.toString()))
+            _isSubmit.postValue(true)
+        }
     }
 }

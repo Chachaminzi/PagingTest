@@ -1,19 +1,19 @@
 package com.example.pagingtest
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.pagingtest.databinding.ActivityMainBinding
+import com.example.pagingtest.db.SearchDatabase
 import com.example.pagingtest.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -23,8 +23,13 @@ class MainActivity : AppCompatActivity() {
 //    private val mainViewModel: MainViewModel by lazy {
 //        ViewModelProvider(this).get(MainViewModel::class.java)
 //    }
+//   >>  private val mainViewModel by viewModels<MainViewModel>()
 
-    private val mainViewModel by viewModels<MainViewModel>()
+    private val mainViewModel by lazy {
+        ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(application)).get(
+            MainViewModel::class.java
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,11 +70,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         // SearchView 탐색 ( 이전 검색 리스트 호출 )
-        val items = arrayOf("부산", "울산", "서울", "대전")
+        updateAdapter(emptyList())
+        // update 시
+        mainViewModel.keywordList.observe(this) {
+            if (!it.isNullOrEmpty()) {
+                updateAdapter(it)
+            }
+        }
+    }
+
+    private fun updateAdapter(items: List<String>) {
         val autoCompleteAdapter = ArrayAdapter(this, R.layout.item_auto_complete, items)
         binding.mainAutoCompleteTv.apply {
             setAdapter(autoCompleteAdapter)
-            setOnFocusChangeListener { view, focus ->
+            setOnFocusChangeListener { _, focus ->
                 if (focus) {
                     showDropDown()
                 }

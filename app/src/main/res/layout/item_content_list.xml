@@ -63,6 +63,7 @@
             android:id="@+id/content_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            app:imageUrl="@{content.thumbnail}"
             app:layout_constraintEnd_toStartOf="@id/content_gl_end"
             app:layout_constraintTop_toTopOf="@id/content_name" />
 
