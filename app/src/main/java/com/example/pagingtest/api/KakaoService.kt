@@ -6,6 +6,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
@@ -17,17 +18,17 @@ private const val BASE_URL = "https://dapi.kakao.com"
 interface KakaoService {
 
     @GET("/v2/search/blog")
-    fun searchBlog(
-        @Header("Authorization") apiKey: String = API_KEY,
+    suspend fun searchBlog(
+        @Header("Authorization") apiKey: String = ("KakaoAK $API_KEY"),
         @Query("query") query: String,
         @Query("sort") sort: String = "accuracy",
         @Query("page") page: Int,
         @Query("size") size: Int
-    )
+    ): BlogSearchResponse
 
     @GET("/v2/search/cafe")
     suspend fun searchCafe(
-        @Header("Authorization") apiKey: String = ("KakaoAK ${API_KEY}"),
+        @Header("Authorization") apiKey: String = ("KakaoAK $API_KEY"),
         @Query("query") query: String,
         @Query("sort") sort: String = "accuracy",
         @Query("page") page: Int,

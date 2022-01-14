@@ -1,10 +1,10 @@
 package com.example.pagingtest
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -14,10 +14,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.paging.map
 import com.example.pagingtest.api.Network
 import com.example.pagingtest.databinding.FragmentContentListBinding
-import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.viewmodels.ContentListViewModel
 import com.example.pagingtest.viewmodels.MainViewModel
@@ -25,7 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class ContentListFragment : Fragment() {
+class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private var _binding: FragmentContentListBinding? = null
     private val binding get() = _binding!!
@@ -64,25 +62,17 @@ class ContentListFragment : Fragment() {
             searchJob?.cancel()
             searchJob = lifecycleScope.launch {
                 mainViewModel.submitQuery.value?.let { query ->
-                    contentViewModel.searchCafe(query).collectLatest {
-                        val lists = it.map { cafe ->
-                            Content(
-                                cafe.thumbnail,
-                                "cafe",
-                                cafe.cafeName,
-                                cafe.title,
-                                cafe.contents,
-                                cafe.datetime,
-                                cafe.url
-                            )
-                        }
-                        adapter.submitData(lists)
-                        Log.d("ContentListFragment", it.toString())
-                    }
+                    loadList(contentViewModel.spinnerSelected.value ?: 0, adapter)
                 }
             }
         }
 
+        // Spinner
+        contentViewModel.spinnerSelected.observe(viewLifecycleOwner) { spinner ->
+            lifecycleScope.launch {
+                loadList(spinner, adapter)
+            }
+        }
         return binding.root
     }
 
@@ -114,6 +104,41 @@ class ContentListFragment : Fragment() {
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.contentListFilterSpinner.adapter = adapter
+        }
+
+        binding.contentListFilterSpinner.onItemSelectedListener = this
+    }
+
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+        contentViewModel.updateSpinnerSelected(p2)
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+    }
+
+    private suspend fun loadList(spinner: Int, adapter: ContentAdapter) {
+        when (spinner) {
+            0 -> {
+//                        mainViewModel.submitQuery.value?.let { query ->
+//                            contentViewModel.searchContent(query).collectLatest {
+//                                adapter.submitData(it)
+//                            }
+//                        }
+            }
+            1 -> {
+                mainViewModel.submitQuery.value?.let { query ->
+                    contentViewModel.searchBlog(query).collectLatest {
+                        adapter.submitData(it)
+                    }
+                }
+            }
+            2 -> {
+                mainViewModel.submitQuery.value?.let { query ->
+                    contentViewModel.searchCafe(query).collectLatest {
+                        adapter.submitData(it)
+                    }
+                }
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ import java.io.IOException
 
 private const val KAKAO_STARTING_PAGE_INDEX = 1
 
-class KakaoPagingSource(
+class KakaoCafePagingSource(
     private val service: KakaoService,
     private val query: String
 ) : PagingSource<Int, CafeDocuments>() {

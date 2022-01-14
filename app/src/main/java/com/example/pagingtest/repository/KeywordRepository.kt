@@ -15,4 +15,8 @@ class KeywordRepository(private val database: SearchDatabase) {
     suspend fun updateKeyword(keyword: KeywordEntity) {
         database.keywordDao.insert(keyword)
     }
+
+    suspend fun deleteKeywordOverLimit() {
+        database.keywordDao.deleteLast()
+    }
 }

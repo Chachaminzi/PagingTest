@@ -1,5 +1,6 @@
 package com.example.pagingtest
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ class ContentAdapter(private val onClickListener: ContentClickListener) :
         fun bind(item: Content, clickListener: ContentClickListener) {
             binding.content = item
             binding.clickListener = clickListener
+            Log.d("binder ", item.label)
             binding.executePendingBindings()
         }
 

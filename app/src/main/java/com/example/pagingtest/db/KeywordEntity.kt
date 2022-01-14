@@ -6,8 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "search_database")
 data class KeywordEntity(
-    @PrimaryKey(autoGenerate = true)
-    var keyId: Long = 0,
+    @PrimaryKey
     @ColumnInfo(name = "record_name")
     val recordName: String,
     @ColumnInfo(name = "record_time")

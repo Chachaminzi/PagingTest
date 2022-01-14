@@ -46,7 +46,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun submitBtnClicked() {
         viewModelScope.launch {
-            keywordRepository.updateKeyword(KeywordEntity(recordName = submitQuery.value.toString()))
+            keywordRepository.updateKeyword(
+                KeywordEntity(
+                    recordName = submitQuery.value.toString(),
+                    recordTime = System.currentTimeMillis()
+                )
+            )
+            keywordRepository.deleteKeywordOverLimit()
             _isSubmit.postValue(true)
         }
     }
