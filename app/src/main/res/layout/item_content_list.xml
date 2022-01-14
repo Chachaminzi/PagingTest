@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:hint="date time"
-            android:text="@{content.dateTime}"
+            app:text="@{content.dateTime}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/content_image"
             app:layout_constraintStart_toEndOf="@id/content_gl_start"

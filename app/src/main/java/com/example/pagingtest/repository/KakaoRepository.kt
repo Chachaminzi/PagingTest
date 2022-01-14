@@ -1,17 +1,12 @@
 package com.example.pagingtest.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
-import com.example.pagingtest.api.BlogDocuments
-import com.example.pagingtest.api.CafeDocuments
+import androidx.paging.*
 import com.example.pagingtest.api.KakaoService
+import com.example.pagingtest.convertStringToDateString
 import com.example.pagingtest.models.Content
 import com.example.pagingtest.paging.KakaoBlogPagingSource
 import com.example.pagingtest.paging.KakaoCafePagingSource
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 class KakaoRepository(private val service: KakaoService) {
 

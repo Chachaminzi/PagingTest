@@ -76,7 +76,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="dateTime"
-                android:text="@{item.dateTime}"
+                app:text="@{item.dateTime}"
                 app:layout_constraintEnd_toEndOf="@id/content_item_gl_end"
                 app:layout_constraintStart_toStartOf="@id/content_item_gl_start"
                 app:layout_constraintTop_toBottomOf="@id/content_item_contents" />

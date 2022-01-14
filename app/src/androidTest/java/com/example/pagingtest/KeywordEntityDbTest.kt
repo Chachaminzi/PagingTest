@@ -8,7 +8,10 @@ import com.example.pagingtest.db.KeywordEntity
 import com.example.pagingtest.db.KeywordDao
 import com.example.pagingtest.db.SearchDatabase
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -37,7 +40,7 @@ class KeywordEntityDbTest {
 
     @Test
     @Throws(Exception::class)
-    fun insertKeyword() = runBlocking {
+    fun insertKeyword() {
         val keywords = listOf(
             KeywordEntity(recordName = "딸기"),
             KeywordEntity(recordName = "바나나"),
@@ -46,11 +49,13 @@ class KeywordEntityDbTest {
             KeywordEntity(recordName = "얼그레이")
         )
 
-        for (key in keywords) {
-            keywordDao.insert(key)
+        runBlocking {
+            for (key in keywords) {
+                keywordDao.insert(key)
+            }
         }
 
-        val lists = keywordDao.getAllKeyword()
-        Log.d("DBTEST", lists.toString())
+        val lists = keywordDao.testAllKeyword()
+        assertEquals(5, lists.size)
     }
 }

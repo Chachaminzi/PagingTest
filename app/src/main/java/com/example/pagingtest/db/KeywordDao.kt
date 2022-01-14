@@ -16,4 +16,7 @@ interface KeywordDao {
 
     @Query("SELECT * FROM search_database")
     fun getAllKeyword(): LiveData<List<KeywordEntity>>
+
+    @Query("SELECT * FROM search_database")
+    fun testAllKeyword(): List<KeywordEntity>
 }

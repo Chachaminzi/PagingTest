@@ -1,18 +1,17 @@
 package com.example.pagingtest.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.flatMap
-import androidx.paging.map
+import androidx.paging.*
 import com.example.pagingtest.api.BlogDocuments
 import com.example.pagingtest.api.BlogSearchResponse
 import com.example.pagingtest.api.CafeDocuments
 import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class ContentListViewModel(private val repository: KakaoRepository) : ViewModel() {
@@ -29,6 +28,7 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
         currentCafeQuery = queryString
         val newResult: Flow<PagingData<Content>> =
             repository.getCafeResultStream(queryString).cachedIn(viewModelScope)
+
         currentCafeResult = newResult
         return newResult
     }
@@ -45,10 +45,10 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
         currentBlogQuery = queryString
         val newResult: Flow<PagingData<Content>> =
             repository.getBlogResultStream(queryString).cachedIn(viewModelScope)
+
         currentBlogResult = newResult
         return newResult
     }
-
 
     // merge
     private var currentBothQuery: String? = null
@@ -62,16 +62,14 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
         }
 
         currentBothQuery = queryString
-        val newBlogResult: Flow<PagingData<Content>> =
-            repository.getBlogResultStream(queryString).cachedIn(viewModelScope)
 
-        val newCafeResult: Flow<PagingData<Content>> =
-            repository.getCafeResultStream(queryString).cachedIn(viewModelScope)
+        val newCafeResult: Flow<PagingData<Content>> = repository.getCafeResultStream(queryString)
+        val newBlogResult: Flow<PagingData<Content>> = repository.getBlogResultStream(queryString)
 
-        val newResult = flowOf(newBlogResult, newCafeResult).flattenMerge()
+//        val newResult = merge(newBlogResult, newCafeResult)
 
-        currentBothResult = newResult
-        return newResult
+        currentBothResult = flowOf(newCafeResult, newBlogResult).flattenConcat()
+        return currentBothResult!!
     }
 
     /**

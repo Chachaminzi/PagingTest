@@ -35,6 +35,15 @@ interface KakaoService {
         @Query("size") size: Int
     ): CafeSearchResponse
 
+    @GET("/v2/search/cafe")
+    suspend fun testCafe(
+        @Header("Authorization") apiKey: String = ("KakaoAK $API_KEY"),
+        @Query("query") query: String,
+        @Query("sort") sort: String = "accuracy",
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<CafeSearchResponse>
+
     companion object {
         private const val API_KEY = "cf985255b7b7b4352176956958b45b03"
     }
@@ -42,7 +51,7 @@ interface KakaoService {
 
 object Network {
     private val logger = HttpLoggingInterceptor {
-        Log.d("API", it)
+        //Log.d("API", it)
     }.apply {
         level = HttpLoggingInterceptor.Level.BASIC
     }
@@ -56,6 +65,14 @@ object Network {
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
+            .build()
+            .create(KakaoService::class.java)
+    }
+
+    val testApi: KakaoService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(KakaoService::class.java)
     }
