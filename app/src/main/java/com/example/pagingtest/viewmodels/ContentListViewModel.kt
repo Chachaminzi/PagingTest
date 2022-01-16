@@ -18,6 +18,7 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
         }
 
         currentCafeQuery = queryString
+
         val newResult: Flow<PagingData<Content>> =
             repository.getCafeResultStream(queryString).cachedIn(viewModelScope)
 
@@ -55,12 +56,12 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
 
         currentBothQuery = queryString
 
-        val newCafeResult: Flow<PagingData<Content>> = repository.getCafeResultStream(queryString)
-        val newBlogResult: Flow<PagingData<Content>> = repository.getBlogResultStream(queryString)
+//        val newCafeResult: Flow<PagingData<Content>> = repository.getCafeResultStream(queryString)
+//        val newBlogResult: Flow<PagingData<Content>> = repository.getBlogResultStream(queryString)
 
 //        val newResult = merge(newBlogResult, newCafeResult)
 
-        currentBothResult = flowOf(newCafeResult, newBlogResult).flattenConcat()
+//        currentBothResult = flowOf(newCafeResult, newBlogResult).flattenConcat()
         return currentBothResult!!
     }
 

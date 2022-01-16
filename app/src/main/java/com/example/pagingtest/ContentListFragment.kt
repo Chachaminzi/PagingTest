@@ -18,6 +18,8 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.pagingtest.api.Network
 import com.example.pagingtest.databinding.FragmentContentListBinding
+import com.example.pagingtest.db.SearchDatabase
+import com.example.pagingtest.db.getDatabase
 import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.viewmodels.ContentListViewModel
@@ -38,7 +40,12 @@ class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(ContentListViewModel::class.java)) {
-                    return ContentListViewModel(KakaoRepository(Network.retrofit)) as T
+                    return ContentListViewModel(
+                        KakaoRepository(
+                            getDatabase(requireContext()),
+                            Network.retrofit
+                        )
+                    ) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
@@ -123,11 +130,11 @@ class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private suspend fun loadList(spinner: Int, adapter: ContentAdapter) {
         when (spinner) {
             0 -> {
-                mainViewModel.submitQuery.value?.let { query ->
-                    contentViewModel.searchContent(query).collectLatest {
-                        adapter.submitData(it)
-                    }
-                }
+//                mainViewModel.submitQuery.value?.let { query ->
+//                    contentViewModel.searchContent(query).collectLatest {
+//                        adapter.submitData(it)
+//                    }
+//                }
             }
             1 -> {
                 mainViewModel.submitQuery.value?.let { query ->
@@ -154,8 +161,10 @@ class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
 //                        compareValues(data1, data2)
 //                    }
 
-                    contentViewModel.searchCafe(query).collectLatest {
-                        adapter.submitData(it)
+                    if (!query.isNullOrBlank()) {
+                        contentViewModel.searchCafe(query).collectLatest {
+                            adapter.submitData(it)
+                        }
                     }
                 }
             }
