@@ -1,17 +1,9 @@
 package com.example.pagingtest.viewmodels
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
-import com.example.pagingtest.api.BlogDocuments
-import com.example.pagingtest.api.BlogSearchResponse
-import com.example.pagingtest.api.CafeDocuments
 import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class ContentListViewModel(private val repository: KakaoRepository) : ViewModel() {

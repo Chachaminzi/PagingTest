@@ -1,8 +1,10 @@
 package com.example.pagingtest.api
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -42,7 +44,7 @@ interface KakaoService {
         @Query("sort") sort: String = "accuracy",
         @Query("page") page: Int,
         @Query("size") size: Int
-    ): Call<CafeSearchResponse>
+    ): Flow<CafeSearchResponse>
 
     companion object {
         private const val API_KEY = "cf985255b7b7b4352176956958b45b03"
