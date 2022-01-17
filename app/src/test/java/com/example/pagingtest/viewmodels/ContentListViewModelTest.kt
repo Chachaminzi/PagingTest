@@ -1,17 +1,14 @@
 package com.example.pagingtest.viewmodels
 
-import androidx.paging.PagingData
 import com.example.pagingtest.api.CafeSearchResponse
 import com.example.pagingtest.api.KakaoService
 import com.example.pagingtest.db.SearchDatabase
 import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
-import io.mockk.MockK
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert

@@ -5,10 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [KeywordEntity::class, ContentEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [KeywordEntity::class, ContentEntity::class, RemoteKeys::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class SearchDatabase : RoomDatabase() {
     abstract val keywordDao: KeywordDao
     abstract val contentDao: ContentDao
+    abstract val remoteKeyDao: RemoteKeyDao
 }
 
 private lateinit var INSTANCE: SearchDatabase

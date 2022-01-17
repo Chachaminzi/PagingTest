@@ -9,6 +9,9 @@ interface ContentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(posts : List<ContentEntity>)
 
+    @Query("SELECT * FROM contents")
+    fun getContents(): PagingSource<Int, ContentEntity>
+
     @Query("SELECT * FROM contents ORDER BY title")
     fun getContentsSortByTitle(): PagingSource<Int, ContentEntity>
 
@@ -16,5 +19,5 @@ interface ContentDao {
     fun getContentsSize(): Int?
 
     @Query("DELETE FROM contents")
-    fun deleteAll()
+    fun clearContets()
 }

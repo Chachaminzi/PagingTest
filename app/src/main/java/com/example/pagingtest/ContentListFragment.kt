@@ -145,26 +145,8 @@ class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
             }
             2 -> {
                 mainViewModel.submitQuery.value?.let { query ->
-
-//                    contentViewModel.searchCafe(query).toList().sortedWith { o1, o2 ->
-//                        var data1: String = ""
-//                        var data2: String = ""
-//
-//                        o1.map {
-//                            data1 = it.dateTime
-//                        }
-//
-//                        o2.map {
-//                            data2 = it.dateTime
-//                        }
-//
-//                        compareValues(data1, data2)
-//                    }
-
-                    if (!query.isNullOrBlank()) {
-                        contentViewModel.searchCafe(query).collectLatest {
-                            adapter.submitData(it)
-                        }
+                    contentViewModel.searchCafe(query).collectLatest {
+                        adapter.submitData(it)
                     }
                 }
             }

@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "contents")
 data class ContentEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    var id: Int = 0,
     var thumbnail: String,
     var label: String,
     var name: String,

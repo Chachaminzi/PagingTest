@@ -25,22 +25,18 @@ class KakaoRepository(
     fun getCafeResultStream(query: String) = Pager(
         config = PagingConfig(
             pageSize = NETWORK_PAGE_SIZE,
-            prefetchDistance = NETWORK_PAGE_SIZE,
             enablePlaceholders = false
         ),
         remoteMediator = KakaoRemoteMediator(query, database, service)
     ) {
-        database.contentDao.getContentsSortByTitle()
-    }.flow.map { pagingData ->
-        pagingData.map {
-            Content(it)
-        }
-    }
+        database.contentDao.getContents()
+    }.flow
 
     fun getBlogResultStream(query: String): Flow<PagingData<Content>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
+                prefetchDistance = NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { KakaoBlogPagingSource(service, query) }
