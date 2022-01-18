@@ -18,12 +18,9 @@ import com.example.pagingtest.ContentAdapter
 import com.example.pagingtest.R
 import com.example.pagingtest.api.Network
 import com.example.pagingtest.databinding.FragmentContentListBinding
-<<<<<<< HEAD:app/src/main/java/com/example/pagingtest/ui/ContentListFragment.kt
-=======
 import com.example.pagingtest.db.SearchDatabase
 import com.example.pagingtest.db.getDatabase
 import com.example.pagingtest.models.Content
->>>>>>> origin/main:app/src/main/java/com/example/pagingtest/ContentListFragment.kt
 import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.viewmodels.ContentListViewModel
 import com.example.pagingtest.viewmodels.MainViewModel

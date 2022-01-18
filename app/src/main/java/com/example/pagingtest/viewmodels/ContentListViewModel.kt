@@ -12,22 +12,18 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
     private var currentCafeResult: Flow<PagingData<Content>>? = null
 
     fun searchCafe(queryString: String): Flow<PagingData<Content>> {
-//        val lastResult = currentCafeResult
-//        if (queryString == currentCafeQuery && lastResult != null) {
-//            return lastResult
-//        }
-//
-//        currentCafeQuery = queryString
-//
-//        val newResult: Flow<PagingData<Content>> =
-        return repository.getCafeResultStream(queryString).map { pagingData ->
-            pagingData.map {
-                Content(it)
-            }
+        val lastResult = currentCafeResult
+        if (queryString == currentCafeQuery && lastResult != null) {
+            return lastResult
         }
 
-//        currentCafeResult = newResult
-//        return newResult
+        currentCafeQuery = queryString
+
+        val newResult: Flow<PagingData<Content>> =
+            repository.getCafeResultStream(queryString).cachedIn(viewModelScope)
+
+        currentCafeResult = newResult
+        return newResult
     }
 
     private var currentBlogQuery: String? = null

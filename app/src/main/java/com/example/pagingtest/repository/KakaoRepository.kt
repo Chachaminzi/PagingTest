@@ -21,7 +21,6 @@ class KakaoRepository(
     private val service: KakaoService
 ) {
 
-<<<<<<< HEAD
     fun getCafeResultStream(query: String): Flow<PagingData<Content>> {
         return Pager(
             config = PagingConfig(
@@ -36,18 +35,6 @@ class KakaoRepository(
             }
         }
     }
-=======
-    @OptIn(ExperimentalPagingApi::class)
-    fun getCafeResultStream(query: String) = Pager(
-        config = PagingConfig(
-            pageSize = NETWORK_PAGE_SIZE,
-            enablePlaceholders = false
-        ),
-        remoteMediator = KakaoRemoteMediator(query, database, service)
-    ) {
-        database.contentDao.getContents()
-    }.flow
->>>>>>> origin/main
 
     fun getBlogResultStream(query: String): Flow<PagingData<Content>> {
         return Pager(
