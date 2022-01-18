@@ -1,12 +1,14 @@
 package com.example.pagingtest.viewmodels
 
-import androidx.paging.PagingData
+import com.example.pagingtest.api.CafeSearchResponse
 import com.example.pagingtest.api.KakaoService
+import com.example.pagingtest.db.SearchDatabase
 import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
@@ -27,11 +29,15 @@ class ContentListViewModelTest {
     @Mock
     private lateinit var service: KakaoService
 
+    @Mock
+    private lateinit var database: SearchDatabase
+
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         service = mockk()
-        repository = KakaoRepository(service)
+        database = mockk()
+        repository = KakaoRepository(database, service)
     }
 
     @After
@@ -40,17 +46,26 @@ class ContentListViewModelTest {
 
     @Test
     fun searchCafe() {
-        coEvery {
-            repository.testCafe("우유")
-        } answers {
-            1
+        // 생성자 확인
+        val sample = mockk<Content> {
+            every { title } returns "sample"
         }
+
+        val result = sample.title
+        Assert.assertTrue(result == "sample")
     }
 
     @Test
     fun isCalledCafe() = runTest {
-        val firstItem = repository.getCafeResultStream("우유").first()
-        Assert.assertTrue(firstItem is PagingData<Content>)
+        // 반환 타입 확인
+        var result = mockk<CafeSearchResponse>()
+        coEvery {
+            repository.testCafe("우유").collect {
+                result = it
+            }
+        }
+
+        Assert.assertTrue(result is CafeSearchResponse)
     }
 
     @Test
@@ -73,6 +88,7 @@ class ContentListViewModelTest {
 //            )
 //        )
 
+        // 몇 번 호출되었는지
         val repo = mock(KakaoRepository::class.java)
 
         repo.getCafeResultStream("우유")

@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "search_database")
+@Entity(tableName = "keywords")
 data class KeywordEntity(
     @PrimaryKey
     @ColumnInfo(name = "record_name")

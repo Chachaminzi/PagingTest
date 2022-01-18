@@ -12,17 +12,22 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
     private var currentCafeResult: Flow<PagingData<Content>>? = null
 
     fun searchCafe(queryString: String): Flow<PagingData<Content>> {
-        val lastResult = currentCafeResult
-        if (queryString == currentCafeQuery && lastResult != null) {
-            return lastResult
+//        val lastResult = currentCafeResult
+//        if (queryString == currentCafeQuery && lastResult != null) {
+//            return lastResult
+//        }
+//
+//        currentCafeQuery = queryString
+//
+//        val newResult: Flow<PagingData<Content>> =
+        return repository.getCafeResultStream(queryString).map { pagingData ->
+            pagingData.map {
+                Content(it)
+            }
         }
 
-        currentCafeQuery = queryString
-        val newResult: Flow<PagingData<Content>> =
-            repository.getCafeResultStream(queryString).cachedIn(viewModelScope)
-
-        currentCafeResult = newResult
-        return newResult
+//        currentCafeResult = newResult
+//        return newResult
     }
 
     private var currentBlogQuery: String? = null
@@ -55,12 +60,12 @@ class ContentListViewModel(private val repository: KakaoRepository) : ViewModel(
 
         currentBothQuery = queryString
 
-        val newCafeResult: Flow<PagingData<Content>> = repository.getCafeResultStream(queryString)
-        val newBlogResult: Flow<PagingData<Content>> = repository.getBlogResultStream(queryString)
+//        val newCafeResult: Flow<PagingData<Content>> = repository.getCafeResultStream(queryString)
+//        val newBlogResult: Flow<PagingData<Content>> = repository.getBlogResultStream(queryString)
 
 //        val newResult = merge(newBlogResult, newCafeResult)
 
-        currentBothResult = flowOf(newCafeResult, newBlogResult).flattenConcat()
+//        currentBothResult = flowOf(newCafeResult, newBlogResult).flattenConcat()
         return currentBothResult!!
     }
 
