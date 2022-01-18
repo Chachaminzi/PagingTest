@@ -1,4 +1,4 @@
-package com.example.pagingtest
+package com.example.pagingtest.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater

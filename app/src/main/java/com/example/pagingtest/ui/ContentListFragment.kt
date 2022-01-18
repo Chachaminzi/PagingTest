@@ -1,4 +1,4 @@
-package com.example.pagingtest
+package com.example.pagingtest.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,18 +14,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.paging.PagingData
-import androidx.paging.map
+import com.example.pagingtest.ContentAdapter
+import com.example.pagingtest.R
 import com.example.pagingtest.api.Network
 import com.example.pagingtest.databinding.FragmentContentListBinding
-import com.example.pagingtest.models.Content
 import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.viewmodels.ContentListViewModel
 import com.example.pagingtest.viewmodels.MainViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
@@ -123,11 +121,11 @@ class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private suspend fun loadList(spinner: Int, adapter: ContentAdapter) {
         when (spinner) {
             0 -> {
-                mainViewModel.submitQuery.value?.let { query ->
-                    contentViewModel.searchContent(query).collectLatest {
-                        adapter.submitData(it)
-                    }
-                }
+//                mainViewModel.submitQuery.value?.let { query ->
+//                    contentViewModel.searchContent(query).collectLatest {
+//                        adapter.submitData(it)
+//                    }
+//                }
             }
             1 -> {
                 mainViewModel.submitQuery.value?.let { query ->
@@ -138,22 +136,6 @@ class ContentListFragment : Fragment(), AdapterView.OnItemSelectedListener {
             }
             2 -> {
                 mainViewModel.submitQuery.value?.let { query ->
-
-//                    contentViewModel.searchCafe(query).toList().sortedWith { o1, o2 ->
-//                        var data1: String = ""
-//                        var data2: String = ""
-//
-//                        o1.map {
-//                            data1 = it.dateTime
-//                        }
-//
-//                        o2.map {
-//                            data2 = it.dateTime
-//                        }
-//
-//                        compareValues(data1, data2)
-//                    }
-
                     contentViewModel.searchCafe(query).collectLatest {
                         adapter.submitData(it)
                     }

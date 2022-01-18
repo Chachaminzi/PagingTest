@@ -1,4 +1,4 @@
-package com.example.pagingtest
+package com.example.pagingtest.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.navArgs
+import com.example.pagingtest.R
 import com.example.pagingtest.databinding.FragmentContentBinding
 import com.example.pagingtest.viewmodels.MainViewModel
 

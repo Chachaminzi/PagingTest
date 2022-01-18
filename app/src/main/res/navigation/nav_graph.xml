@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/contentListFragment"
-        android:name="com.example.pagingtest.ContentListFragment"
+        android:name="com.example.pagingtest.ui.ContentListFragment"
         android:label="ContentListFragment"
         tools:layout="@layout/fragment_content_list">
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/contentFragment"
-        android:name="com.example.pagingtest.ContentFragment"
+        android:name="com.example.pagingtest.ui.ContentFragment"
         android:label="ContentFragment"
         tools:layout="@layout/fragment_content">
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/webFragment"
-        android:name="com.example.pagingtest.WebFragment"
+        android:name="com.example.pagingtest.ui.WebFragment"
         android:label="WebFragment"
         tools:layout="@layout/fragment_web" />
 </navigation>

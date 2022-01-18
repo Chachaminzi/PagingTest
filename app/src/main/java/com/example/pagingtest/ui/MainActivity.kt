@@ -1,19 +1,16 @@
-package com.example.pagingtest
+package com.example.pagingtest.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.example.pagingtest.R
 import com.example.pagingtest.databinding.ActivityMainBinding
-import com.example.pagingtest.db.SearchDatabase
 import com.example.pagingtest.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {

@@ -31,30 +31,6 @@ class KakaoRepository(private val service: KakaoService) {
         }
     }
 
-    private fun insertDateSeparator(it: PagingData<Content>): PagingData<Content> {
-        return it.insertSeparators { before, after ->
-            if (after == null) return@insertSeparators null
-            if (before == null) return@insertSeparators null
-
-            val beforeDate = before.dateTime
-            val afterDate = after.dateTime
-
-            Log.d("cafe before : ", before.toString())
-            Log.d("cafe after: ", before.toString())
-            if (beforeDate > afterDate) {
-                before.thumbnail = after.thumbnail.also { after.thumbnail = before.thumbnail }
-                before.label = after.label.also { after.label = before.label }
-                before.name = after.name.also { after.name = before.name }
-                before.title = after.title.also { after.title = before.title }
-                before.contents = after.contents.also { after.contents = before.contents }
-                before.dateTime = after.dateTime.also { after.dateTime = before.dateTime }
-                before.url = after.url.also { after.url = before.url }
-            }
-
-            return@insertSeparators null
-        }
-    }
-
     fun getBlogResultStream(query: String): Flow<PagingData<Content>> {
         return Pager(
             config = PagingConfig(
