@@ -1,16 +1,8 @@
 package com.example.pagingtest
 
-import com.example.pagingtest.api.CafeSearchResponse
-import com.example.pagingtest.api.Network
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.text.DateFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 /**

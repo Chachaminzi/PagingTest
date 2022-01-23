@@ -1,77 +1,129 @@
 package com.example.pagingtest.viewmodels
 
-import androidx.lifecycle.*
-import androidx.paging.*
-import com.example.pagingtest.models.Content
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.example.pagingtest.db.KeywordEntity
+import com.example.pagingtest.models.ItemModel
 import com.example.pagingtest.repository.KakaoRepository
-import kotlinx.coroutines.flow.*
+import com.example.pagingtest.repository.KeywordRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ContentListViewModel(private val repository: KakaoRepository) : ViewModel() {
+@HiltViewModel
+class ContentListViewModel @Inject constructor(
+    private val kakaoRepository: KakaoRepository,
+    private val keywordRepository: KeywordRepository
+) : ViewModel() {
+
+    var selectedPostType = 0
+
+    fun updateSelectedPostType(selected: Int) {
+        selectedPostType = selected
+    }
+
+    private val _filterType = MutableLiveData(0)
+    val filterType: LiveData<Int> get() = _filterType
+
+    fun updateFilter(type: Int) {
+        _filterType.postValue(type)
+    }
+
+    private fun getFilterTypeString(): String {
+        return if (filterType.value == 0) "accuracy" else "recency"
+    }
+
+    /**
+     * Paging
+     **/
+    private var currentFilterType: Int = 0
 
     private var currentCafeQuery: String? = null
-    private var currentCafeResult: Flow<PagingData<Content>>? = null
+    private var currentCafeResult: Flow<PagingData<ItemModel>>? = null
 
-    fun searchCafe(queryString: String): Flow<PagingData<Content>> {
+    fun searchCafe(queryString: String): Flow<PagingData<ItemModel>> {
         val lastResult = currentCafeResult
-        if (queryString == currentCafeQuery && lastResult != null) {
+        if (queryString == currentCafeQuery && currentFilterType == filterType.value && lastResult != null) {
             return lastResult
         }
 
+        currentFilterType = filterType.value!!
         currentCafeQuery = queryString
-
-        val newResult: Flow<PagingData<Content>> =
-            repository.getCafeResultStream(queryString).cachedIn(viewModelScope)
+        val newResult: Flow<PagingData<ItemModel>> =
+            kakaoRepository.getCafeResultStream(queryString, getFilterTypeString())
+                .cachedIn(viewModelScope)
 
         currentCafeResult = newResult
         return newResult
     }
 
     private var currentBlogQuery: String? = null
-    private var currentBlogResult: Flow<PagingData<Content>>? = null
+    private var currentBlogResult: Flow<PagingData<ItemModel>>? = null
 
-    fun searchBlog(queryString: String): Flow<PagingData<Content>> {
+    fun searchBlog(queryString: String): Flow<PagingData<ItemModel>> {
         val lastResult = currentBlogResult
-        if (queryString == currentBlogQuery && lastResult != null) {
+        if (queryString == currentBlogQuery && currentFilterType == filterType.value && lastResult != null) {
             return lastResult
         }
 
         currentBlogQuery = queryString
-        val newResult: Flow<PagingData<Content>> =
-            repository.getBlogResultStream(queryString).cachedIn(viewModelScope)
+        val newResult: Flow<PagingData<ItemModel>> =
+            kakaoRepository.getBlogResultStream(queryString, getFilterTypeString())
+                .cachedIn(viewModelScope)
 
         currentBlogResult = newResult
         return newResult
     }
 
-    // merge
-    private var currentBothQuery: String? = null
-    private var currentBothResult: Flow<PagingData<Content>>? = null
-
-    fun searchContent(queryString: String): Flow<PagingData<Content>> {
-        val lastResult = currentBothResult
-
-        if (queryString == currentBothQuery && lastResult != null) {
-            return lastResult
-        }
-
-        currentBothQuery = queryString
-
-//        val newCafeResult: Flow<PagingData<Content>> = repository.getCafeResultStream(queryString)
-//        val newBlogResult: Flow<PagingData<Content>> = repository.getBlogResultStream(queryString)
-
-//        val newResult = merge(newBlogResult, newCafeResult)
-
-//        currentBothResult = flowOf(newCafeResult, newBlogResult).flattenConcat()
-        return currentBothResult!!
-    }
+//    private var currentMergeQuery: String? = null
+//    private var currentMergeResult: Flow<PagingData<ItemModel>>? = null
+//
+//    fun searchAll(queryString: String): Flow<PagingData<ItemModel>> {
+//        val lastResult = currentMergeResult
+//        if (queryString == currentMergeQuery && lastResult != null) {
+//            return lastResult
+//        }
+//
+//        currentMergeQuery = queryString
+//        val newBlogResult: Flow<PagingData<ItemModel>> =
+//            kakaoRepository.getBlogResultStream(queryString)
+//        val newCafeResult: Flow<PagingData<ItemModel>> =
+//            kakaoRepository.getCafeResultStream(queryString)
+//
+//        val newMergeResult =
+//            flowOf(newBlogResult, newCafeResult).flattenMerge().cachedIn(viewModelScope)
+//
+//        currentMergeResult = newMergeResult
+//        return newMergeResult
+//    }
 
     /**
-     * Spinner
+     * 검색어
      **/
-    private val _spinnerSelected = MutableLiveData<Int>()
-    val spinnerSelected: LiveData<Int> get() = _spinnerSelected
+    val keywordList = keywordRepository.keywords
 
-    fun updateSpinnerSelected(selected: Int) {
-        _spinnerSelected.postValue(selected)
+    // tool bar Submit query
+    val submitQuery = MutableLiveData<String>()
+    private val _isSubmit = MutableLiveData<Boolean>()
+    val isSubmit: LiveData<Boolean> get() = _isSubmit
+
+    fun updateSpinnerSelected() {
+        if (!submitQuery.value.isNullOrBlank()) {
+            viewModelScope.launch {
+                keywordRepository.updateKeyword(
+                    KeywordEntity(
+                        recordName = submitQuery.value.toString(),
+                        recordTime = System.currentTimeMillis()
+                    )
+                )
+                keywordRepository.deleteKeywordOverLimit()
+                _isSubmit.postValue(true)
+            }
+        }
     }
 }

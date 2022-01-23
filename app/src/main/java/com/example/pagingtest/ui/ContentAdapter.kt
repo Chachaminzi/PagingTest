@@ -1,58 +1,131 @@
-package com.example.pagingtest
+package com.example.pagingtest.ui
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.AdapterView
+import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pagingtest.databinding.HeaderContentListBinding
 import com.example.pagingtest.databinding.ItemContentListBinding
 import com.example.pagingtest.models.Content
+import com.example.pagingtest.models.ItemModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class ContentAdapter(private val onClickListener: ContentClickListener) :
-    PagingDataAdapter<Content, ContentAdapter.ViewHolder>(ContentDiffCallback()) {
+private const val VIEW_TYPE_HEADER = 0
+private const val VIEW_TYPE_ITEM = 1
 
-    class ViewHolder private constructor(private val binding: ItemContentListBinding) :
+class ContentAdapter(
+    private val onClickListener: ContentClickListener,
+    private val filterClickListener: FilterClickListener,
+    private val spinnerAdapter: AdapterView.OnItemSelectedListener,
+) :
+    PagingDataAdapter<ItemModel, RecyclerView.ViewHolder>(ContentDiffCallback) {
+
+    private var currentPostType: Int = 0
+
+    class ItemViewHolder private constructor(private val binding: ItemContentListBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Content, clickListener: ContentClickListener) {
-            binding.content = item
+        fun bind(content: Content, clickListener: ContentClickListener) {
+            binding.item = content
             binding.clickListener = clickListener
-            Log.d("binder ", item.label)
             binding.executePendingBindings()
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup): ItemViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ItemContentListBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
+                return ItemViewHolder(binding)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
-    }
+    class HeaderViewHolder private constructor(private val binding: HeaderContentListBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        item?.let {
-            holder.bind(it, onClickListener)
+        fun bind(
+            filterClickListener: FilterClickListener,
+            itemSelectedListener: AdapterView.OnItemSelectedListener,
+            currentPostType: Int
+        ) {
+            binding.filterClickListener = filterClickListener
+            binding.headerSpinner.onItemSelectedListener = itemSelectedListener
+            binding.headerSpinner.setSelection(currentPostType)
+            binding.executePendingBindings()
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): HeaderViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = HeaderContentListBinding.inflate(layoutInflater, parent, false)
+                return HeaderViewHolder(binding)
+            }
         }
     }
 
-    class ContentClickListener(private val clickListener: (item: Content) -> Unit) {
-        fun onClick(item: Content) = clickListener(item)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
+        VIEW_TYPE_HEADER -> HeaderViewHolder.from(parent)
+        VIEW_TYPE_ITEM -> ItemViewHolder.from(parent)
+        else -> throw IllegalStateException("Not Found ViewHolder Type $viewType")
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == VIEW_TYPE_HEADER) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val itemModel = getItem(position)
+        itemModel?.let { itemModel ->
+            when (itemModel) {
+                is ItemModel.ContentItem -> (holder as ItemViewHolder).bind(
+                    itemModel.content,
+                    onClickListener
+                )
+                is ItemModel.HeaderItem -> (holder as HeaderViewHolder).bind(
+                    filterClickListener,
+                    spinnerAdapter,
+                    currentPostType
+                )
+            }
+        }
+    }
+
+    private val adapterScope = CoroutineScope(Dispatchers.Default)
+
+    fun submitHeaderAndList(newPostType: Int, pagingData: PagingData<ItemModel>) {
+        adapterScope.launch {
+            currentPostType = newPostType
+            withContext(Dispatchers.Main) {
+                submitData(pagingData)
+            }
+        }
     }
 }
 
-class ContentDiffCallback : DiffUtil.ItemCallback<Content>() {
-    override fun areItemsTheSame(oldItem: Content, newItem: Content): Boolean {
-        return oldItem.contents == newItem.contents
+object ContentDiffCallback : DiffUtil.ItemCallback<ItemModel>() {
+    override fun areItemsTheSame(oldItem: ItemModel, newItem: ItemModel): Boolean {
+        val isSameContentItem =
+            (oldItem is ItemModel.ContentItem && newItem is ItemModel.ContentItem && oldItem.content == newItem.content)
+        val isSameHeaderItem =
+            (oldItem is ItemModel.HeaderItem && newItem is ItemModel.HeaderItem && oldItem.string == newItem.string)
+        return isSameContentItem || isSameHeaderItem
     }
 
-    override fun areContentsTheSame(oldItem: Content, newItem: Content): Boolean {
+    override fun areContentsTheSame(oldItem: ItemModel, newItem: ItemModel): Boolean {
         return oldItem == newItem
     }
+}
+
+class ContentClickListener(private val clickListener: (item: Content) -> Unit) {
+    fun onClick(item: Content) = clickListener(item)
+}
+
+class FilterClickListener(private val clickListener: () -> Unit) {
+    fun onClick() = clickListener()
 }

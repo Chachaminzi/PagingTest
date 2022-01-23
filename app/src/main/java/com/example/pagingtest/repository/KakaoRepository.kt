@@ -1,66 +1,61 @@
 package com.example.pagingtest.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.paging.*
-import com.example.pagingtest.api.CafeSearchResponse
 import com.example.pagingtest.api.KakaoService
-import com.example.pagingtest.convertStringToDateString
-import com.example.pagingtest.db.SearchDatabase
 import com.example.pagingtest.models.Content
+import com.example.pagingtest.models.ItemModel
 import com.example.pagingtest.paging.KakaoBlogPagingSource
 import com.example.pagingtest.paging.KakaoCafePagingSource
-import com.example.pagingtest.paging.KakaoRemoteMediator
-import kotlinx.coroutines.flow.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class KakaoRepository(
-    private val database: SearchDatabase,
+
+class KakaoRepository @Inject constructor(
     private val service: KakaoService
 ) {
 
-    fun getCafeResultStream(query: String): Flow<PagingData<Content>> {
+    fun getCafeResultStream(query: String, sortType: String): Flow<PagingData<ItemModel>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
                 prefetchDistance = NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { KakaoCafePagingSource(service, query) }
+            pagingSourceFactory = { KakaoCafePagingSource(service, query, sortType) }
         ).flow.map { pagingData ->
             pagingData.map {
-                Content(it)
+                ItemModel.ContentItem(Content(it))
+            }
+        }.map {
+            it.insertSeparators { before, _ ->
+                when (before) {
+                    null -> ItemModel.HeaderItem("HEADER")
+                    else -> null
+                }
             }
         }
     }
 
-    fun getBlogResultStream(query: String): Flow<PagingData<Content>> {
+    fun getBlogResultStream(query: String, sortType: String): Flow<PagingData<ItemModel>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
                 prefetchDistance = NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { KakaoBlogPagingSource(service, query) }
+            pagingSourceFactory = { KakaoBlogPagingSource(service, query, sortType) }
         ).flow.map { pagingData ->
             pagingData.map {
-                Content(it)
+                ItemModel.ContentItem(Content(it))
             }
-        }
-    }
-
-    /**
-     * test
-     **/
-    fun testCafe(query: String): Flow<CafeSearchResponse> {
-        return flow {
-            service.testCafe(
-                query = query,
-                page = 1,
-                size = 25
-            )
+        }.map {
+            it.insertSeparators { before, _ ->
+                when (before) {
+                    null -> ItemModel.HeaderItem("HEADER")
+                    else -> null
+                }
+            }
         }
     }
 

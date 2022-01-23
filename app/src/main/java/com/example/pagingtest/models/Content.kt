@@ -1,9 +1,11 @@
 package com.example.pagingtest.models
 
+import android.os.Parcelable
 import com.example.pagingtest.api.BlogDocuments
 import com.example.pagingtest.api.CafeDocuments
-import com.example.pagingtest.db.ContentEntity
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class Content(
     val thumbnail: String,
     val label: String,
@@ -13,7 +15,7 @@ data class Content(
     val dateTime: String,
     val url: String,
     var isClicked: Boolean
-) {
+) : Parcelable {
     constructor(cafe: CafeDocuments) : this(
         cafe.thumbnail,
         "cafe",
@@ -34,16 +36,5 @@ data class Content(
         blog.datetime,
         blog.url,
         false
-    )
-
-    constructor(entity: ContentEntity) : this(
-        entity.thumbnail,
-        entity.label,
-        entity.name,
-        entity.title,
-        entity.contents,
-        entity.dateTime,
-        entity.url,
-        entity.isClicked
     )
 }
