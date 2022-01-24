@@ -89,6 +89,6 @@
             app:layout_constraintEnd_toStartOf="@id/content_image"
             app:layout_constraintStart_toEndOf="@id/content_gl_start"
             app:layout_constraintTop_toBottomOf="@id/content_title"
-            app:text="@{item.dateTime}" />
+            app:text="@{item}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

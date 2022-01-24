@@ -6,7 +6,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.pagingtest.R
-import com.example.pagingtest.convertStringToDateString
+import com.example.pagingtest.models.Content
 
 @BindingAdapter("imageUrl")
 fun bindImageFromUrl(imageView: ImageView, url: String?) {
@@ -21,8 +21,6 @@ fun bindImageFromUrl(imageView: ImageView, url: String?) {
 }
 
 @BindingAdapter("text")
-fun TextView.bindDateFormat(string: String?) {
-    text = string?.let {
-        convertStringToDateString(string)
-    }
+fun TextView.bindDateFormat(content: Content) {
+    text = content.displayText("yyyy년 MM월 dd일")
 }

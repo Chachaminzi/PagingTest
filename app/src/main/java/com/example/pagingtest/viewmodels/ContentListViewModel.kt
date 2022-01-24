@@ -12,6 +12,8 @@ import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.repository.KeywordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,10 +24,6 @@ class ContentListViewModel @Inject constructor(
 ) : ViewModel() {
 
     var selectedPostType = 0
-
-    fun updateSelectedPostType(selected: Int) {
-        selectedPostType = selected
-    }
 
     private val _filterType = MutableLiveData(0)
     val filterType: LiveData<Int> get() = _filterType
@@ -80,27 +78,31 @@ class ContentListViewModel @Inject constructor(
         return newResult
     }
 
-//    private var currentMergeQuery: String? = null
-//    private var currentMergeResult: Flow<PagingData<ItemModel>>? = null
-//
-//    fun searchAll(queryString: String): Flow<PagingData<ItemModel>> {
-//        val lastResult = currentMergeResult
-//        if (queryString == currentMergeQuery && lastResult != null) {
-//            return lastResult
-//        }
-//
-//        currentMergeQuery = queryString
-//        val newBlogResult: Flow<PagingData<ItemModel>> =
-//            kakaoRepository.getBlogResultStream(queryString)
-//        val newCafeResult: Flow<PagingData<ItemModel>> =
-//            kakaoRepository.getCafeResultStream(queryString)
-//
-//        val newMergeResult =
-//            flowOf(newBlogResult, newCafeResult).flattenMerge().cachedIn(viewModelScope)
-//
-//        currentMergeResult = newMergeResult
-//        return newMergeResult
-//    }
+    // TODO (ContentListViewModel로 이동)
+    private var _itemPagingData = MutableLiveData<PagingData<ItemModel>>()
+    val itemPagingData: LiveData<PagingData<ItemModel>> get() = _itemPagingData
+
+    suspend fun loadList() {
+        submitQuery.value?.let { query ->
+            when (selectedPostType) {
+                0 -> {
+//                    contentViewModel.searchAll(query).collectLatest {
+//                        recyclerAdapter.submitData(it)
+//                    }
+                }
+                1 -> {
+                    searchBlog(query).collectLatest {
+                        _itemPagingData.postValue(it)
+                    }
+                }
+                2 -> {
+                    searchCafe(query).collectLatest {
+                        _itemPagingData.postValue(it)
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 검색어
@@ -112,7 +114,11 @@ class ContentListViewModel @Inject constructor(
     private val _isSubmit = MutableLiveData<Boolean>()
     val isSubmit: LiveData<Boolean> get() = _isSubmit
 
-    fun updateSpinnerSelected() {
+    fun updateSpinnerSelected(position: Int?) {
+        position?.let {
+            selectedPostType = it
+        }
+
         if (!submitQuery.value.isNullOrBlank()) {
             viewModelScope.launch {
                 keywordRepository.updateKeyword(

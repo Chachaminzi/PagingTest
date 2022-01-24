@@ -37,7 +37,7 @@ class WebFragment : Fragment() {
 
         binding.webToolbar.title = args.title
 
-        if (!args.url.isNullOrBlank()) {
+        if (args.url.isNotBlank()) {
             binding.urlWebView.apply {
                 settings.javaScriptEnabled = true
                 webViewClient = WebViewClient()

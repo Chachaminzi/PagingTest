@@ -1,9 +1,15 @@
 package com.example.pagingtest.models
 
 import android.os.Parcelable
+import android.util.Log
 import com.example.pagingtest.api.BlogDocuments
 import com.example.pagingtest.api.CafeDocuments
 import kotlinx.android.parcel.Parcelize
+import java.sql.Timestamp
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Parcelize
 data class Content(
@@ -37,4 +43,14 @@ data class Content(
         blog.url,
         false
     )
+
+    fun displayText(format: String): String {
+        val resultParsing = LocalDate.parse(this.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        return resultParsing.format(DateTimeFormatter.ofPattern(format)).toString()
+    }
+
+    fun getTimeStamp(): Long {
+        val zonedDateTime = ZonedDateTime.parse(this.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        return Timestamp.from(zonedDateTime.toInstant()).time
+    }
 }

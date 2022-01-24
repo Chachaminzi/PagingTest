@@ -7,8 +7,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/web_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary" />
+        android:layout_height="?attr/actionBarSize" />
 
     <WebView
         android:id="@+id/url_web_view"

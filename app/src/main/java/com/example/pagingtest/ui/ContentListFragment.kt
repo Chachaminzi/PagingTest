@@ -40,12 +40,13 @@ class ContentListFragment : Fragment() {
     private val contentViewModel by viewModels<ContentListViewModel>()
 
     private val spinnerAdapter = object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(p0: AdapterView<*>?, p1: View?, value: Int, p3: Long) {
-            lifecycleScope.launch {
-                contentViewModel.updateSelectedPostType(value)
-                contentViewModel.updateSpinnerSelected()
-                loadList()
-            }
+        override fun onItemSelected(
+            adapterView: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            getItemId: Long
+        ) {
+            contentViewModel.updateSpinnerSelected(position)
         }
 
         override fun onNothingSelected(view: AdapterView<*>?) {
@@ -53,6 +54,7 @@ class ContentListFragment : Fragment() {
     }
 
     private val recyclerAdapter by lazy {
+        // TODO(ConcatAdapter로 변경)
         ContentAdapter(
             ContentClickListener {
                 binding.root.findNavController().navigate(
@@ -105,27 +107,27 @@ class ContentListFragment : Fragment() {
         binding.contentListRv.adapter = recyclerAdapter
         contentViewModel.isSubmit.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
-                loadList()
+                contentViewModel.loadList()
             }
         }
 
         // Filter Type
         contentViewModel.filterType.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
-                loadList()
+                contentViewModel.loadList()
             }
         }
 
-        // App Bar
-        val navController = NavHostFragment.findNavController(this)
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        binding.contentListToolbar.setupWithNavController(navController, appBarConfiguration)
-
-        updateAdapter(emptyList())
+//        updateAdapter(emptyList())
         contentViewModel.keywordList.observe(viewLifecycleOwner) { keywords ->
             if (!keywords.isNullOrEmpty()) {
                 updateAdapter(keywords)
             }
+        }
+
+        // paging data update
+        contentViewModel.itemPagingData.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitHeaderAndList(contentViewModel.selectedPostType, it)
         }
     }
 
@@ -139,28 +141,6 @@ class ContentListFragment : Fragment() {
             }
             setOnClickListener {
                 showDropDown()
-            }
-        }
-    }
-
-    private suspend fun loadList() {
-        contentViewModel.submitQuery.value?.let { query ->
-            when (contentViewModel.selectedPostType) {
-                0 -> {
-//                    contentViewModel.searchAll(query).collectLatest {
-//                        recyclerAdapter.submitData(it)
-//                    }
-                }
-                1 -> {
-                    contentViewModel.searchBlog(query).collectLatest {
-                        recyclerAdapter.submitHeaderAndList(contentViewModel.selectedPostType, it)
-                    }
-                }
-                2 -> {
-                    contentViewModel.searchCafe(query).collectLatest {
-                        recyclerAdapter.submitHeaderAndList(contentViewModel.selectedPostType, it)
-                    }
-                }
             }
         }
     }
