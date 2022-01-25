@@ -2,13 +2,11 @@ package com.example.pagingtest
 
 import android.util.Log
 import org.bouncycastle.asn1.cms.TimeStampAndCRL
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.sql.Timestamp
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 /**
@@ -24,7 +22,9 @@ class ExampleUnitTest {
 
     @Test
     fun date_format() {
-        val string = "2017-05-06T00:36:45-09:00"
+        val string1 = "2017-05-06T00:36:45+04:00"
+        val string2 = "2017-05-06T00:36:45+03:00"
+
 //        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 //        val reFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
 //        val resultParsing = LocalDate.parse(string, formatter)
@@ -33,10 +33,12 @@ class ExampleUnitTest {
 //        assertEquals(resultParsing.toString(), "2017-05-06")
 //        assertEquals(result.toString(), "2017년 05월 06일")
 
-        val localDateTime = LocalDateTime.parse(string, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        val zonedDateTime = ZonedDateTime.parse(string, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val zonedDateTime1 = ZonedDateTime.parse(string1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val zonedDateTime2 = ZonedDateTime.parse(string2, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
-        val ztts = Timestamp.from(zonedDateTime.toInstant())
-        val tts = Timestamp.from(localDateTime.toInstant(zonedDateTime.offset))
+        val ztts1 = Timestamp.from(zonedDateTime1.toInstant())
+        val ztts2 = Timestamp.from(zonedDateTime2.toInstant())
+
+        assertEquals(ztts1.time, ztts2.time)
     }
 }

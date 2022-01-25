@@ -114,18 +114,13 @@ class ContentListViewModel @Inject constructor(
     private val _isSubmit = MutableLiveData<Boolean>()
     val isSubmit: LiveData<Boolean> get() = _isSubmit
 
-    private val _hideKeyboard = MutableLiveData<Boolean>()
-    val hideKeyboard: LiveData<Boolean> get() = _hideKeyboard
-
     fun updateSubmitQuery(position: Int) {
         submitQuery.postValue(keywordList.value?.get(position))
-        _hideKeyboard.postValue(true)
         _isSubmit.postValue(true)
     }
 
     fun updateSpinnerSelected(position: Int) {
         selectedPostType = position
-        _hideKeyboard.postValue(true)
 
         if (!submitQuery.value.isNullOrBlank()) {
             viewModelScope.launch {

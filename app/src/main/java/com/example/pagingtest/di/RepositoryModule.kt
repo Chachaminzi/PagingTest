@@ -7,15 +7,15 @@ import com.example.pagingtest.repository.KeywordRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(ActivityComponent::class)
 @Module
 class RepositoryModule {
 
     @Provides
-    @ActivityRetainedScoped
     fun provideKakaoRepository(
         service: KakaoService
     ): KakaoRepository {
@@ -23,7 +23,6 @@ class RepositoryModule {
     }
 
     @Provides
-    @ActivityRetainedScoped
     fun provideKeywordRepository(
         database: SearchDatabase
     ): KeywordRepository {

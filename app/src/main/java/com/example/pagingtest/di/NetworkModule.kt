@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
@@ -40,8 +41,20 @@ class NetworkModule {
             .build()
     }
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KakaoRetrofit
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class NaverRetrofit
+
+    @KakaoRetrofit
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun provideKakaoRetrofit(
+        okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://dapi.kakao.com")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -49,9 +62,22 @@ class NetworkModule {
             .build()
     }
 
+    @NaverRetrofit
+    @Provides
+    fun provideNaverRetrofit(
+        okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://openapi.naver.com")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(okHttpClient)
+            .build()
+    }
+
     @Provides
     @Singleton
-    fun provideKakaoService(retrofit: Retrofit): KakaoService {
+    fun provideKakaoService(@KakaoRetrofit retrofit: Retrofit): KakaoService {
         return retrofit.create(KakaoService::class.java)
     }
 }

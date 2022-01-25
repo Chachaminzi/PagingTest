@@ -67,16 +67,7 @@ class ContentListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // RecyclerView 이동
-//        lifecycleScope.launch {
-//            recyclerAdapter.submitData(
-//                PagingData.from(
-//                    listOf(ItemModel.HeaderItem("Header"))
-//                )
-//            )
-//        }
-
-        // TODO(ConcatAdapter로 변경)
+        // RecyclerView
         val contentAdapter = ContentAdapter(
             ContentClickListener {
                 binding.root.findNavController().navigate(
@@ -109,16 +100,14 @@ class ContentListFragment : Fragment() {
         binding.contentListRv.adapter = concatAdapter
         contentViewModel.isSubmit.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
+                hideKeyboard()
                 contentViewModel.loadList()
             }
         }
 
-        // Edittext 포커스 지우기 TODO(clickableviewaccessibility)
+        // Edittext 포커스 지우기
         binding.contentListRv.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                binding.mainSearchEt.clearFocus()
-                true
-            }
+            binding.mainSearchEt.clearFocus()
             false
         }
 
@@ -134,22 +123,14 @@ class ContentListFragment : Fragment() {
             if (hasFocus) {
                 binding.mainSearchKeywordList.visibility = View.VISIBLE
             } else {
-                binding.mainSearchKeywordList.visibility = View.GONE
-                // keyboard 내리기
-                (requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-                    .hideSoftInputFromWindow(
-                        binding.mainSearchEt.windowToken,
-                        0
-                    )
+                binding.mainSearchKeywordList.visibility = View.INVISIBLE
+                hideKeyboard()
             }
-        }
-
-        contentViewModel.hideKeyboard.observe(viewLifecycleOwner) {
-            binding.mainSearchEt.clearFocus()
         }
 
         val keywordClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             contentViewModel.updateSubmitQuery(position)
+            hideKeyboard()
         }
         contentViewModel.keywordList.observe(viewLifecycleOwner) { keywords ->
             if (!keywords.isNullOrEmpty()) {
@@ -175,5 +156,14 @@ class ContentListFragment : Fragment() {
             adapter = listAdapter
             onItemClickListener = clickListener
         }
+    }
+
+    private fun hideKeyboard() {
+        binding.mainSearchEt.clearFocus()
+        // keyboard 내리기
+        (requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+            binding.mainSearchEt.windowToken,
+            0
+        )
     }
 }

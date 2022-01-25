@@ -43,11 +43,7 @@ class ContentAdapter(
 
 object ContentDiffCallback : DiffUtil.ItemCallback<Content>() {
     override fun areItemsTheSame(oldItem: Content, newItem: Content): Boolean {
-//        val isSameContentItem =
-//            (oldItem is ItemModel.ContentItem && newItem is ItemModel.ContentItem && oldItem.content == newItem.content)
-//        val isSameHeaderItem =
-//            (oldItem is ItemModel.HeaderItem && newItem is ItemModel.HeaderItem && oldItem.string == newItem.string)
-        return oldItem.contents == newItem.contents
+        return oldItem.title == newItem.title
     }
 
     override fun areContentsTheSame(oldItem: Content, newItem: Content): Boolean {
