@@ -1,19 +1,24 @@
 package com.example.pagingtest.ui
 
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.hardware.input.InputManager
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import androidx.paging.PagingData
 import com.example.pagingtest.R
 import com.example.pagingtest.databinding.FragmentContentListBinding
@@ -22,7 +27,6 @@ import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.repository.KeywordRepository
 import com.example.pagingtest.viewmodels.ContentListViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,10 +45,10 @@ class ContentListFragment : Fragment() {
 
     private val spinnerAdapter = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(
-            adapterView: AdapterView<*>?,
+            parent: AdapterView<*>?,
             view: View?,
             position: Int,
-            getItemId: Long
+            id: Long
         ) {
             contentViewModel.updateSpinnerSelected(position)
         }
@@ -111,6 +115,15 @@ class ContentListFragment : Fragment() {
             }
         }
 
+        // Edittext 포커스 지우기
+        binding.contentListRv.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                binding.mainSearchEt.clearFocus()
+                true
+            }
+            false
+        }
+
         // Filter Type
         contentViewModel.filterType.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
@@ -118,10 +131,31 @@ class ContentListFragment : Fragment() {
             }
         }
 
-//        updateAdapter(emptyList())
+        // keyword
+        binding.mainSearchEt.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                binding.mainSearchKeywordList.visibility = View.VISIBLE
+            } else {
+                binding.mainSearchKeywordList.visibility = View.GONE
+                // keyboard 내리기
+                (requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(
+                        binding.mainSearchEt.windowToken,
+                        0
+                    )
+            }
+        }
+
+        contentViewModel.hideKeyboard.observe(viewLifecycleOwner) {
+            binding.mainSearchEt.clearFocus()
+        }
+
+        val keywordClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            contentViewModel.updateSubmitQuery(position)
+        }
         contentViewModel.keywordList.observe(viewLifecycleOwner) { keywords ->
             if (!keywords.isNullOrEmpty()) {
-                updateAdapter(keywords)
+                updateAdapter(keywords, keywordClickListener)
             }
         }
 
@@ -131,17 +165,11 @@ class ContentListFragment : Fragment() {
         }
     }
 
-    private fun updateAdapter(items: List<String>) {
-        val autoCompleteAdapter =
-            MyAutoArrayAdapter(requireContext(), R.layout.item_drop_down, items)
-        binding.mainAutoCompleteTv.apply {
-            setAdapter(autoCompleteAdapter)
-            setOnFocusChangeListener { _, focus ->
-                showDropDown()
-            }
-            setOnClickListener {
-                showDropDown()
-            }
+    private fun updateAdapter(items: List<String>, clickListener: AdapterView.OnItemClickListener) {
+        val listAdapter = ArrayAdapter(requireContext(), R.layout.item_drop_down, items)
+        binding.mainSearchKeywordList.apply {
+            adapter = listAdapter
+            onItemClickListener = clickListener
         }
     }
 }

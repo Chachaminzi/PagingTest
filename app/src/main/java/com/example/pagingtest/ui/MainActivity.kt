@@ -1,6 +1,7 @@
 package com.example.pagingtest.ui
 
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.pagingtest.R

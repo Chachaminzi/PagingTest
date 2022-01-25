@@ -44,7 +44,7 @@ class ContentListViewModel @Inject constructor(
     private var currentCafeQuery: String? = null
     private var currentCafeResult: Flow<PagingData<ItemModel>>? = null
 
-    fun searchCafe(queryString: String): Flow<PagingData<ItemModel>> {
+    private fun searchCafe(queryString: String): Flow<PagingData<ItemModel>> {
         val lastResult = currentCafeResult
         if (queryString == currentCafeQuery && currentFilterType == filterType.value && lastResult != null) {
             return lastResult
@@ -63,7 +63,7 @@ class ContentListViewModel @Inject constructor(
     private var currentBlogQuery: String? = null
     private var currentBlogResult: Flow<PagingData<ItemModel>>? = null
 
-    fun searchBlog(queryString: String): Flow<PagingData<ItemModel>> {
+    private fun searchBlog(queryString: String): Flow<PagingData<ItemModel>> {
         val lastResult = currentBlogResult
         if (queryString == currentBlogQuery && currentFilterType == filterType.value && lastResult != null) {
             return lastResult
@@ -77,8 +77,7 @@ class ContentListViewModel @Inject constructor(
         currentBlogResult = newResult
         return newResult
     }
-
-    // TODO (ContentListViewModel로 이동)
+    
     private var _itemPagingData = MutableLiveData<PagingData<ItemModel>>()
     val itemPagingData: LiveData<PagingData<ItemModel>> get() = _itemPagingData
 
@@ -114,10 +113,18 @@ class ContentListViewModel @Inject constructor(
     private val _isSubmit = MutableLiveData<Boolean>()
     val isSubmit: LiveData<Boolean> get() = _isSubmit
 
-    fun updateSpinnerSelected(position: Int?) {
-        position?.let {
-            selectedPostType = it
-        }
+    private val _hideKeyboard = MutableLiveData<Boolean>()
+    val hideKeyboard: LiveData<Boolean> get() = _hideKeyboard
+
+    fun updateSubmitQuery(position: Int) {
+        submitQuery.postValue(keywordList.value?.get(position))
+        _hideKeyboard.postValue(true)
+        _isSubmit.postValue(true)
+    }
+
+    fun updateSpinnerSelected(position: Int) {
+        selectedPostType = position
+        _hideKeyboard.postValue(true)
 
         if (!submitQuery.value.isNullOrBlank()) {
             viewModelScope.launch {
