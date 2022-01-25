@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.pagingtest.db.KeywordEntity
+import com.example.pagingtest.models.Content
 import com.example.pagingtest.models.ItemModel
 import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.repository.KeywordRepository
@@ -42,9 +43,9 @@ class ContentListViewModel @Inject constructor(
     private var currentFilterType: Int = 0
 
     private var currentCafeQuery: String? = null
-    private var currentCafeResult: Flow<PagingData<ItemModel>>? = null
+    private var currentCafeResult: Flow<PagingData<Content>>? = null
 
-    private fun searchCafe(queryString: String): Flow<PagingData<ItemModel>> {
+    private fun searchCafe(queryString: String): Flow<PagingData<Content>> {
         val lastResult = currentCafeResult
         if (queryString == currentCafeQuery && currentFilterType == filterType.value && lastResult != null) {
             return lastResult
@@ -52,7 +53,7 @@ class ContentListViewModel @Inject constructor(
 
         currentFilterType = filterType.value!!
         currentCafeQuery = queryString
-        val newResult: Flow<PagingData<ItemModel>> =
+        val newResult: Flow<PagingData<Content>> =
             kakaoRepository.getCafeResultStream(queryString, getFilterTypeString())
                 .cachedIn(viewModelScope)
 
@@ -61,16 +62,16 @@ class ContentListViewModel @Inject constructor(
     }
 
     private var currentBlogQuery: String? = null
-    private var currentBlogResult: Flow<PagingData<ItemModel>>? = null
+    private var currentBlogResult: Flow<PagingData<Content>>? = null
 
-    private fun searchBlog(queryString: String): Flow<PagingData<ItemModel>> {
+    private fun searchBlog(queryString: String): Flow<PagingData<Content>> {
         val lastResult = currentBlogResult
         if (queryString == currentBlogQuery && currentFilterType == filterType.value && lastResult != null) {
             return lastResult
         }
 
         currentBlogQuery = queryString
-        val newResult: Flow<PagingData<ItemModel>> =
+        val newResult: Flow<PagingData<Content>> =
             kakaoRepository.getBlogResultStream(queryString, getFilterTypeString())
                 .cachedIn(viewModelScope)
 
@@ -78,8 +79,8 @@ class ContentListViewModel @Inject constructor(
         return newResult
     }
     
-    private var _itemPagingData = MutableLiveData<PagingData<ItemModel>>()
-    val itemPagingData: LiveData<PagingData<ItemModel>> get() = _itemPagingData
+    private var _itemPagingData = MutableLiveData<PagingData<Content>>()
+    val itemPagingData: LiveData<PagingData<Content>> get() = _itemPagingData
 
     suspend fun loadList() {
         submitQuery.value?.let { query ->

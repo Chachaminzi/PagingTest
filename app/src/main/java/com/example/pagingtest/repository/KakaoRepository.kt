@@ -15,7 +15,7 @@ class KakaoRepository @Inject constructor(
     private val service: KakaoService
 ) {
 
-    fun getCafeResultStream(query: String, sortType: String): Flow<PagingData<ItemModel>> {
+    fun getCafeResultStream(query: String, sortType: String): Flow<PagingData<Content>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
@@ -25,19 +25,12 @@ class KakaoRepository @Inject constructor(
             pagingSourceFactory = { KakaoCafePagingSource(service, query, sortType) }
         ).flow.map { pagingData ->
             pagingData.map {
-                ItemModel.ContentItem(Content(it))
-            }
-        }.map {
-            it.insertSeparators { before, _ ->
-                when (before) {
-                    null -> ItemModel.HeaderItem("HEADER")
-                    else -> null
-                }
+                Content(it)
             }
         }
     }
 
-    fun getBlogResultStream(query: String, sortType: String): Flow<PagingData<ItemModel>> {
+    fun getBlogResultStream(query: String, sortType: String): Flow<PagingData<Content>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
@@ -47,14 +40,7 @@ class KakaoRepository @Inject constructor(
             pagingSourceFactory = { KakaoBlogPagingSource(service, query, sortType) }
         ).flow.map { pagingData ->
             pagingData.map {
-                ItemModel.ContentItem(Content(it))
-            }
-        }.map {
-            it.insertSeparators { before, _ ->
-                when (before) {
-                    null -> ItemModel.HeaderItem("HEADER")
-                    else -> null
-                }
+                Content(it)
             }
         }
     }

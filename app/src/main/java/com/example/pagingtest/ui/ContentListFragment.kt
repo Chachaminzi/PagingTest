@@ -1,8 +1,6 @@
 package com.example.pagingtest.ui
 
-import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
-import android.hardware.input.InputManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -11,18 +9,15 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.paging.PagingData
+import androidx.recyclerview.widget.ConcatAdapter
 import com.example.pagingtest.R
 import com.example.pagingtest.databinding.FragmentContentListBinding
-import com.example.pagingtest.models.ItemModel
 import com.example.pagingtest.repository.KakaoRepository
 import com.example.pagingtest.repository.KeywordRepository
 import com.example.pagingtest.viewmodels.ContentListViewModel
@@ -57,14 +52,40 @@ class ContentListFragment : Fragment() {
         }
     }
 
-    private val recyclerAdapter by lazy {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_content_list, container, false)
+        binding.lifecycleOwner = this
+        binding.viewModel = contentViewModel
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // RecyclerView 이동
+//        lifecycleScope.launch {
+//            recyclerAdapter.submitData(
+//                PagingData.from(
+//                    listOf(ItemModel.HeaderItem("Header"))
+//                )
+//            )
+//        }
+
         // TODO(ConcatAdapter로 변경)
-        ContentAdapter(
+        val contentAdapter = ContentAdapter(
             ContentClickListener {
                 binding.root.findNavController().navigate(
                     ContentListFragmentDirections.actionContentListToContent(it)
                 )
-            },
+            }
+        )
+
+        val filterAdapter = FilterAdapter(
             FilterClickListener {
                 val typeArray = resources.getStringArray(R.array.list_type_array)
                 val builder = AlertDialog.Builder(requireContext())
@@ -83,39 +104,16 @@ class ContentListFragment : Fragment() {
             },
             spinnerAdapter
         )
-    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_content_list, container, false)
-        binding.lifecycleOwner = this
-        binding.viewModel = contentViewModel
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // RecyclerView 이동
-        lifecycleScope.launch {
-            recyclerAdapter.submitData(
-                PagingData.from(
-                    listOf(ItemModel.HeaderItem("Header"))
-                )
-            )
-        }
-        binding.contentListRv.adapter = recyclerAdapter
+        val concatAdapter = ConcatAdapter(filterAdapter, contentAdapter)
+        binding.contentListRv.adapter = concatAdapter
         contentViewModel.isSubmit.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
                 contentViewModel.loadList()
             }
         }
 
-        // Edittext 포커스 지우기
+        // Edittext 포커스 지우기 TODO(clickableviewaccessibility)
         binding.contentListRv.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 binding.mainSearchEt.clearFocus()
@@ -155,17 +153,23 @@ class ContentListFragment : Fragment() {
         }
         contentViewModel.keywordList.observe(viewLifecycleOwner) { keywords ->
             if (!keywords.isNullOrEmpty()) {
-                updateAdapter(keywords, keywordClickListener)
+                updateKeywordAdapter(keywords, keywordClickListener)
             }
         }
 
         // paging data update
         contentViewModel.itemPagingData.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitHeaderAndList(contentViewModel.selectedPostType, it)
+            lifecycleScope.launch {
+                contentAdapter.submitData(it)
+            }
+            filterAdapter.submitPostType(contentViewModel.selectedPostType)
         }
     }
 
-    private fun updateAdapter(items: List<String>, clickListener: AdapterView.OnItemClickListener) {
+    private fun updateKeywordAdapter(
+        items: List<String>,
+        clickListener: AdapterView.OnItemClickListener
+    ) {
         val listAdapter = ArrayAdapter(requireContext(), R.layout.item_drop_down, items)
         binding.mainSearchKeywordList.apply {
             adapter = listAdapter
