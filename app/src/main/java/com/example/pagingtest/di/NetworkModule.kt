@@ -78,6 +78,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideKakaoService(retrofit: Retrofit): KakaoService {
+
         return retrofit.create(KakaoService::class.java)
     }
 }

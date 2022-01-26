@@ -78,7 +78,7 @@ class ContentListViewModel @Inject constructor(
         currentBlogResult = newResult
         return newResult
     }
-    
+
     private var _itemPagingData = MutableLiveData<PagingData<Content>>()
     val itemPagingData: LiveData<PagingData<Content>> get() = _itemPagingData
 
@@ -119,8 +119,10 @@ class ContentListViewModel @Inject constructor(
         _isSubmit.postValue(true)
     }
 
-    fun updateSpinnerSelected(position: Int) {
-        selectedPostType = position
+    fun updateSpinnerSelected(position: Int?) {
+        position?.let {
+            selectedPostType = it
+        }
 
         if (!submitQuery.value.isNullOrBlank()) {
             viewModelScope.launch {

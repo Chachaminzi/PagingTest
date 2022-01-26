@@ -39,6 +39,8 @@ class ExampleUnitTest {
         val ztts1 = Timestamp.from(zonedDateTime1.toInstant())
         val ztts2 = Timestamp.from(zonedDateTime2.toInstant())
 
+        assert(ztts1.compareTo(ztts2) != 0)
+
         assertEquals(ztts1.time, ztts2.time)
     }
 }

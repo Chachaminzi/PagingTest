@@ -3,9 +3,9 @@ package com.example.pagingtest.ui
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -81,6 +81,9 @@ class ContentListFragment : Fragment() {
                 val typeArray = resources.getStringArray(R.array.list_type_array)
                 val builder = AlertDialog.Builder(requireContext())
                 var selectedId = contentViewModel.filterType.value
+
+                hideKeyboard()
+
                 builder.setTitle("Select")
                     .setSingleChoiceItems(typeArray, selectedId!!) { dialog, i ->
                         selectedId = i
@@ -119,12 +122,23 @@ class ContentListFragment : Fragment() {
         }
 
         // keyword
-        binding.mainSearchEt.setOnFocusChangeListener { v, hasFocus ->
-            if (hasFocus) {
-                binding.mainSearchKeywordList.visibility = View.VISIBLE
-            } else {
-                binding.mainSearchKeywordList.visibility = View.INVISIBLE
-                hideKeyboard()
+        binding.mainSearchEt.apply {
+            setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus) {
+                    binding.mainSearchKeywordList.visibility = View.VISIBLE
+                } else {
+                    binding.mainSearchKeywordList.visibility = View.INVISIBLE
+                    hideKeyboard()
+                }
+            }
+            setOnEditorActionListener { v, actionId, event ->
+                return@setOnEditorActionListener when (actionId) {
+                    EditorInfo.IME_ACTION_SEARCH -> {
+                        contentViewModel.updateSpinnerSelected(null)
+                        true
+                    }
+                    else -> false
+                }
             }
         }
 
