@@ -41,35 +41,19 @@ class NetworkModule {
             .build()
     }
 
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class KakaoBaseUrl
-
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class NaverBaseUrl
-
-
-    @KakaoBaseUrl
     @Provides
-    fun provideKakaoBaseUrl(): String {
-        return "https://dapi.kakao.com"
-    }
-
-    @NaverBaseUrl
-    @Provides
-    fun provideNaverBaseUrl(): String {
-        return "https://openapi.naver.com"
+    fun provideBaseUrlHolder(): BaseUrlHolder {
+        return BaseUrlHolder("https://dapi.kakao.com")
     }
 
     @Provides
     fun provideKakaoRetrofit(
         okHttpClient: OkHttpClient,
         moshi: Moshi,
-        @KakaoBaseUrl baseUrl: String
+        baseUrlHolder: BaseUrlHolder
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(baseUrlHolder.baseUrl)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(okHttpClient)
             .build()
@@ -78,7 +62,6 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideKakaoService(retrofit: Retrofit): KakaoService {
-
         return retrofit.create(KakaoService::class.java)
     }
 }
